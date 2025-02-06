@@ -1,9 +1,7 @@
 Which Model
-Meta.ai is using Llama 3 70B
+Deepseek is using Deepseek V3
 
-https://huggingface.co/meta-llama/Meta-Llama-3-70B
+https://huggingface.co/deepseek-ai/DeepSeek-R1
 
 Prompting Guides
 https://www.llama.com/docs/how-to-guides/prompting/
-
-It appears that Lllama does not have any special prompting requirements to best understand context like other models.
