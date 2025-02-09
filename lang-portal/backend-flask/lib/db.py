@@ -130,5 +130,10 @@ class Db:
         data_json_path='seed/study_activities.json'
       )
 
+  def rollback(self):
+    db = g.get('db', None)
+    if db is not None:
+        db.rollback()
+
 # Create an instance of the Db class
 db = Db()
