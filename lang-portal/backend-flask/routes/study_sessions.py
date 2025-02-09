@@ -5,6 +5,73 @@ import math
 
 def load(app):
   # todo /study_sessions POST
+  @app.route('/api/study-sessions', methods=['POST'])
+  @cross_origin()
+  def create_study_session():
+    try:
+      # Validate request body
+      data = request.get_json()
+      if not data or 'group_id' not in data or 'study_activity_id' not in data:
+        return jsonify({"error": "Missing required fields"}), 400
+
+      cursor = app.db.cursor()
+
+      # Verify group exists
+      cursor.execute('SELECT id, name FROM groups WHERE id = ?', (data['group_id'],))
+      group = cursor.fetchone()
+      if not group:
+        return jsonify({"error": "Group not found"}), 404
+
+      # Verify study activity exists
+      cursor.execute('SELECT id, name FROM study_activities WHERE id = ?', 
+                    (data['study_activity_id'],))
+      activity = cursor.fetchone()
+      if not activity:
+        return jsonify({"error": "Study activity not found"}), 404
+
+      # Insert new study session
+      cursor.execute('''
+          INSERT INTO study_sessions (group_id, study_activity_id, created_at)
+          VALUES (?, ?, datetime('now'))
+      ''', (data['group_id'], data['study_activity_id']))
+      
+      session_id = cursor.lastrowid
+      app.db.commit()
+
+      # Fetch created session
+      cursor.execute('''
+          SELECT 
+              ss.id,
+              ss.group_id,
+              g.name as group_name,
+              sa.id as activity_id,
+              sa.name as activity_name,
+              ss.created_at,
+              COUNT(wri.id) as review_items_count
+          FROM study_sessions ss
+          JOIN groups g ON g.id = ss.group_id
+          JOIN study_activities sa ON sa.id = ss.study_activity_id
+          LEFT JOIN word_review_items wri ON wri.study_session_id = ss.id
+          WHERE ss.id = ?
+          GROUP BY ss.id
+      ''', (session_id,))
+      
+      session = cursor.fetchone()
+
+      return jsonify({
+          'id': session['id'],
+          'group_id': session['group_id'],
+          'group_name': session['group_name'],
+          'activity_id': session['activity_id'],
+          'activity_name': session['activity_name'],
+          'start_time': session['created_at'],
+          'end_time': session['created_at'],
+          'review_items_count': session['review_items_count']
+      }), 201
+
+    except Exception as e:
+      app.db.rollback()
+      return jsonify({"error": str(e)}), 500
 
   @app.route('/api/study-sessions', methods=['GET'])
   @cross_origin()
