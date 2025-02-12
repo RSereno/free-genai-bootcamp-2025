@@ -1,0 +1,221 @@
+# Frontend Technical Specs
+
+## Tech Stack
+- Next.js
+
+## Pages
+- Dashboard /dashboard
+- Study Activities /study-activities
+- Words /words
+- Words Groups /words-groups
+- Sessions /sessions
+- Settings /settings
+
+## Page Specifications
+
+### Dashboard ('/dashboard')
+Purpose: Give users a quick overview of their progress and recent activity.
+
+API Endpoints:
+- GET /api/dashboard/last-study-sessions
+- GET /api/dashboard/study-progress
+- GET /api/dashboard/quick-stats
+
+Features:
+1. Last Study Sessions
+- Show last activity used
+- Shows when last activity was done
+- Summarizes wrong vs correct answers from last activity
+- Has a button to view details of the last activity
+
+2. Study Progress
+- Shows total words known and total words unknown (e.g., 300/1000)
+- Shows a progress bar of known vs unknown words (e.g., 30% known, 70% unknown)
+- Has a button to view progress details
+
+3. Quick Stats
+- Success rate
+- Total words studied
+- Total words correct
+- Total words incorrect
+- Total study sessions completed
+- Total active groups
+- Current Study streak
+- Longest Study streak
+
+4. Start New Session
+- Button to start new study session (navigates to /study-activities)
+
+### Study Activities ('/study-activities')
+Purpose: Display and manage study activities and sessions.
+
+API Endpoints:
+- GET /api/study-activities
+- GET /api/study-activities/:id
+- GET /api/study-activities/:id/study-session
+- POST /api/study-activities/
+
+Features:
+1. Study Activity Card
+- Thumbnail display
+- Activity name
+- Button to start new session
+- Button to view activity details
+
+2. Activity Details ('/study-activity/:id')
+- Detailed activity information
+- Session start button
+- Activity details view
+- Study Activities List with pagination including:
+  - ID
+  - Activity name
+  - Group name
+  - Start time
+  - End time (inferred from last word_review_item)
+  - Number of words studied
+
+3. Activity Launch ('/study-activities/:id/study-session')
+- New session launch functionality
+- Opens in new tab
+- Activity details view button
+- Auto-navigation after completion
+
+### Words ('/words')
+Purpose: Manage and view all words in the database.
+
+API Endpoints:
+- GET /api/words
+
+Features:
+1. Paginated Word List
+- Columns:
+  - Word
+  - Meaning
+  - Correct count
+  - Incorrect count
+  - Group name
+- Pagination (100 words per page):
+  - Page number
+  - Page size
+  - Total pages
+  - Total items
+
+2. Search and Filter
+- Word search
+- Group filter
+- Meaning filter
+- Correct count filter
+- Incorrect count filter
+
+3. Actions
+- View word details (navigates to /words/:id)
+
+### Word Show ('/words/:id')
+Purpose: Display detailed information about a specific word.
+
+Features:
+1. Word Details
+- Word name
+- Meaning
+- Study Statistics
+  - Correct count
+  - Incorrect count
+  - Total study sessions
+  - Last study session date
+- Word Groups
+  - Show a series of pills with the group names eg. tags
+  - When the group name is clicked, will navigate to /words-groups/:id
+
+API Endpoints:
+- GET /api/words/:id
+
+### Words Groups ('/words-groups')
+Purpose: Display and manage all word groups.
+
+API Endpoints:
+- GET /api/words-groups 
+
+Features:
+1. Paginated Word Group List
+- Columns:
+  - Group name
+  - Group words count
+- Pagination (100 groups per page):
+  - Page number
+  - Page size
+  - Total pages
+  - Total items
+- Actions
+  - View group details (navigates to /words-groups/:id)
+
+### Words Groups Show ('/words-groups/:id')
+Purpose: Display detailed information about a specific word group.
+
+API Endpoints:
+- GET /api/words-groups/:id
+- GET /api/words-groups/:id/words
+- GET /api/words-groups/:id/study-sessions
+
+Features:
+1. Word Group Details   
+- Group name
+- Group statistics
+  - Group words count
+- Words in Group (Paginated list of words)
+  - Should use the same component as the words list in the words page
+- Study Sessions (Paginated list of study sessions)
+  - Should use the same component as the study sessions index page
+
+### Study Sessions ('/study_sessions')
+Purpose: Display and manage all study sessions.
+
+API Endpoints:
+- GET /api/study_sessions
+
+Features:
+1. Paginated Study Session List
+- Columns:
+  - Session ID
+  - Activity name
+  - Group name
+  - Start time
+  - End time
+  - Number of Review Items
+  - Actions
+    - View session details (navigates to /study_sessions/:id)
+
+### Study Session Show ('/study_sessions/:id')
+Purpose: Display detailed information about a specific study session.
+
+API Endpoints:
+- GET /api/study_sessions/:id
+- GET /api/study_sessions/:id/words
+
+Features:
+1. Study Session Details
+- Activity name
+- Group name
+- Start time
+- End time
+- Number of Review Items
+2. Words Review Items (Paginated list of words)
+- Should use the same component as the words index page
+
+### Settings ('/settings')
+Purpose: Display and manage user settings.
+
+API Endpoints:
+- POST /api/settings
+- POST /api/settings/reset-progress
+
+Features:
+1. Theme Settings
+- Toggle between light and dark mode
+- Toggle between system default, light, and dark mode
+
+2. Reset Progress
+- Button to reset progress
+- Confirmation modal
+
+3. Reload Seed Data
+- This will drop all table and re-create the tables with the seed data
