@@ -207,7 +207,7 @@ Response: 200 OK
 }
 ```
 
-- POST /api/study-activities/
+- POST /api/study_activities/
     - Required params:
         - group_id: integer
         - study_activity_id: integer

@@ -17,9 +17,9 @@
 Purpose: Give users a quick overview of their progress and recent activity.
 
 API Endpoints:
-- GET /api/dashboard/last-study-sessions
-- GET /api/dashboard/study-progress
-- GET /api/dashboard/quick-stats
+- GET /api/dashboard/last_study_sessions
+- GET /api/dashboard/study_progress
+- GET /api/dashboard/quick_stats
 
 Features:
 1. Last Study Sessions
@@ -50,19 +50,19 @@ Features:
 Purpose: Display and manage study activities and sessions.
 
 API Endpoints:
-- GET /api/study-activities
-- GET /api/study-activities/:id
-- GET /api/study-activities/:id/study-session
-- POST /api/study-activities/
+- GET /api/study_activities
+- GET /api/study_activities/:id
+- GET /api/study_activities/:id/study_session
+- POST /api/study_activities
 
 Features:
 1. Study Activity Card
-- Thumbnail display
-- Activity name
+- Show a thumbnail of the study activity
+- Show the name of the study activity
 - Button to start new session
 - Button to view activity details
 
-2. Activity Details ('/study-activity/:id')
+2. Activity Details ('/study_activity/:id')
 - Detailed activity information
 - Session start button
 - Activity details view
@@ -133,7 +133,7 @@ API Endpoints:
 Purpose: Display and manage all word groups.
 
 API Endpoints:
-- GET /api/words-groups 
+- GET /api/words_groups
 
 Features:
 1. Paginated Word Group List
@@ -152,9 +152,9 @@ Features:
 Purpose: Display detailed information about a specific word group.
 
 API Endpoints:
-- GET /api/words-groups/:id
-- GET /api/words-groups/:id/words
-- GET /api/words-groups/:id/study-sessions
+- GET /api/words_groups/:id
+- GET /api/words_groups/:id/words
+- GET /api/words_groups/:id/study_sessions
 
 Features:
 1. Word Group Details   
@@ -205,8 +205,10 @@ Features:
 Purpose: Display and manage user settings.
 
 API Endpoints:
+- GET /api/settings
 - POST /api/settings
-- POST /api/settings/reset-progress
+- POST /api/full_reset
+- POST /api/reset_history
 
 Features:
 1. Theme Settings
@@ -214,8 +216,9 @@ Features:
 - Toggle between system default, light, and dark mode
 
 2. Reset Progress
-- Button to reset progress
-- Confirmation modal
+- Button to reset all study progress (words known/unknown, study history).
+- Confirmation modal to prevent accidental data loss.
 
 3. Reload Seed Data
-- This will drop all table and re-create the tables with the seed data
+- This will drop all tables and re-create the tables with the initial seed data.
+- Use with caution: all user-specific data will be lost.
