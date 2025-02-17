@@ -1,0 +1,27 @@
+[
+  {
+    "english": "hello",
+    "portuguese": "olá",
+    "parts": "interjection"
+  },
+  {
+    "english": "goodbye",
+    "portuguese": "adeus",
+    "parts": "interjection"
+  },
+  {
+    "english": "thank you",
+    "portuguese": "obrigado",
+    "parts": "phrase"
+  },
+  {
+    "english": "yes",
+    "portuguese": "sim",
+    "parts": "adverb"
+  },
+  {
+    "english": "no",
+    "portuguese": "não",
+    "parts": "adverb"
+  }
+] 

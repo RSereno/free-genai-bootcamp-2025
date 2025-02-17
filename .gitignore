@@ -32,3 +32,36 @@ wheels/
 *.swp
 *.swo
 .DS_Store 
+
+# GO
+# Binaries
+/$(basename $(go env GOPATH))/bin/*
+/$(basename $(go env GOBIN))/*
+/$(basename $(pwd))
+
+# Dependency management tools
+/.modules
+
+# IDE specific files
+/.idea/*
+/.vscode/*
+
+# OS generated files
+._*
+.DS_Store
+*.swp
+*.swo
+*.tmp
+
+# Test binary
+*.test
+
+# Coverage files
+*.out
+*.cov
+
+# Executable files
+*.exe
+
+# Log files
+*.log
