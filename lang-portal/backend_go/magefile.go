@@ -8,16 +8,26 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/magefile/mage/mg"
 	_ "github.com/mattn/go-sqlite3" // Import SQLite driver
 )
 
+type DB mg.Namespace
+
+// Define your tasks with mg.Namespace if needed
+var (
+	DB = mg.Namespace("db", "Database operations")
+)
+
 // InitDb initializes the database by creating the words.db file if it doesn't exist.
-func InitDb() error {
+func (DB) Init() error {
 	fmt.Println("Initializing database...")
 
 	dbPath := filepath.Join(".", "words.db") // Database file in the project root
@@ -46,7 +56,7 @@ func InitDb() error {
 }
 
 // Migrate runs database migrations.
-func Migrate() error {
+func (DB) Migrate() error {
 	fmt.Println("Running database migrations...")
 
 	dbPath := filepath.Join(".", "words.db")
@@ -159,7 +169,7 @@ func recordMigration(db *sql.DB, id int) error {
 }
 
 // Seed seeds the database with initial data.
-func Seed() error {
+func (DB) Seed() error {
 	fmt.Println("Seeding database with data...")
 
 	dbPath := filepath.Join(".", "words.db")
@@ -205,7 +215,20 @@ func Seed() error {
 
 				for column, value := range item {
 					columns = append(columns, column)
-					values = append(values, value)
+					// Handle time.Time values
+					if column == "created_at" {
+						timeStr, ok := value.(string)
+						if !ok {
+							return fmt.Errorf("created_at value is not a string: %v", value)
+						}
+						parsedTime, err := time.Parse(time.RFC3339, timeStr)
+						if err != nil {
+							return fmt.Errorf("failed to parse created_at time: %w", err)
+						}
+						values = append(values, parsedTime)
+					} else {
+						values = append(values, value)
+					}
 					placeholders = append(placeholders, "?")
 				}
 
@@ -238,7 +261,28 @@ func Install() error {
 }
 
 // Default task to run when you just type `mage`
-var Default = Seed
+var Default = DB.Seed
+
+// Run all tests
+func Test() error {
+	fmt.Println("Running tests...")
+	cmd := exec.Command("go", "test", "./...", "-v")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// Run tests with coverage
+func TestCover() error {
+	fmt.Println("Running tests with coverage...")
+	cmd := exec.Command("go", "test", "./...", "-coverprofile=coverage.out", "-covermode=atomic")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return exec.Command("go", "tool", "cover", "-html=coverage.out").Run()
+}
 
 /*
 ```
