@@ -1,0 +1,26 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_container
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8g
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    security_opt:
+      - no-new-privileges
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_NICE
+    read_only: true
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+
+volumes:
+  ollama:
