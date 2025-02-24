@@ -54,7 +54,28 @@ Alternatively, you can set the PYTHONPATH environment variable to include the Ge
 export PYTHONPATH=$PYTHONPATH:~/code/bootcamp/GenAIComps
 ```
 
+## Download (Pull) a model
+Check if model is available (ie docker wasn´t shutdown) if not download it again. 
+
+```sh
+curl http://localhost:11434/api/pull -d '{
+  "model": "deepseek-r1:7b"
+}'
+```
+
+
+curl -X POST http://localhost:8000/v1/example-service \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-r1:latest",
+    "messages": "Hello, how are you?"
+    }'\
+  -o response.json
+
+
 # Technical Uncertainty
  Q: To be able to implement this need to understand the concepts in example provided. Mainly EMBEDDING_SERVICE and LLM_SERVICE. The LLM Service is the LLM it self but what is the Embedding one.
 
  A: Found my answer here https://github.com/opea-project/GenAIComps/blob/main/comps/embeddings/src/README.md
+
+ Q: Getting the deepseek model using the api doesnt seem to work it doesnt give any error but the model doesnt become available needs revision. Temporary using "docker exec -it ollama ollama run deepseek-r1" to get the model.
