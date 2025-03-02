@@ -63,15 +63,15 @@ curl http://localhost:11434/api/pull -d '{
 }'
 ```
 
-
+## Querying the Megaservice
+```sh
 curl -X POST http://localhost:8000/v1/example-service \
   -H "Content-Type: application/json" \
   -d '{
     "model": "deepseek-r1:latest",
     "messages": "Hello, how are you?"
-    }'\
-  -o response.json
-
+    }'
+```
 
 # Technical Uncertainty
  Q: To be able to implement this need to understand the concepts in example provided. Mainly EMBEDDING_SERVICE and LLM_SERVICE. The LLM Service is the LLM it self but what is the Embedding one.
