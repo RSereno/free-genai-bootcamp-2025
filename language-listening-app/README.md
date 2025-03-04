@@ -38,9 +38,23 @@ As an Applied AI Engineer, this project aims to create an automated system that:
 
 ## Setup Instructions
 
+### Environment Configuration
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env with your actual API keys
+nano .env
+```
+
 ### API Configuration
 ```bash
 export GROQ_API_KEY='your-api-key'
+```
+
+### Venv start
+```bash
+source .venv/bin/activate
 ```
 
 ### Running the Application
