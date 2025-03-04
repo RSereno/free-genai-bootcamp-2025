@@ -24,7 +24,7 @@ class GroqChat:
             completion = self.client.chat.completions.create(
                 model=self.model_id,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "system", "content": "You are a helpful language assistant specializing in European Portuguese (from Portugal). When asked about Portuguese language, always provide answers specific to European Portuguese, not Brazilian Portuguese. If there are differences between European and Brazilian Portuguese, explicitly mention them and prioritize the European variant."},
                     {"role": "user", "content": message}
                 ],
                 temperature=inference_config["temperature"]

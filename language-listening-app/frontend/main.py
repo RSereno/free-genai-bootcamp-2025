@@ -8,11 +8,13 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from backend.chat import GroqChat
+
 
 # Page config
 st.set_page_config(
-    page_title="Japanese Learning Assistant",
-    page_icon="🎌",
+    page_title="Portuguese Learning Assistant",
+    page_icon="🇵🇹",
     layout="wide"
 )
 
@@ -24,14 +26,14 @@ if 'messages' not in st.session_state:
 
 def render_header():
     """Render the header section"""
-    st.title("🎌 Japanese Learning Assistant")
+    st.title("🇵🇹 Portuguese Learning Assistant")
     st.markdown("""
-    Transform YouTube transcripts into interactive Japanese learning experiences.
+    Transform YouTube transcripts into interactive Portuguese learning experiences.
     
     This tool demonstrates:
     - Base LLM Capabilities
     - RAG (Retrieval Augmented Generation)
-    - Amazon Bedrock Integration
+    - Groq Integration
     - Agent-based Learning Systems
     """)
 
@@ -44,7 +46,7 @@ def render_sidebar():
         selected_stage = st.radio(
             "Select Stage:",
             [
-                "1. Chat with Nova",
+                "1. Chat with Groq",
                 "2. Raw Transcript",
                 "3. Structured Data",
                 "4. RAG Implementation",
@@ -54,9 +56,9 @@ def render_sidebar():
         
         # Stage descriptions
         stage_info = {
-            "1. Chat with Nova": """
+            "1. Chat with Groq": """
             **Current Focus:**
-            - Basic Japanese learning
+            - Basic Portuguese learning
             - Understanding LLM capabilities
             - Identifying limitations
             """,
@@ -77,7 +79,7 @@ def render_sidebar():
             
             "4. RAG Implementation": """
             **Current Focus:**
-            - Bedrock embeddings
+            - Groq embeddings
             - Vector storage
             - Context retrieval
             """,
@@ -95,57 +97,57 @@ def render_sidebar():
         
         return selected_stage
 
-# def render_chat_stage():
-#     """Render an improved chat interface"""
-#     st.header("Chat with Nova")
+def render_chat_stage():
+    """Render an improved chat interface"""
+    st.header("Chat with Groq")
 
-#     # Initialize BedrockChat instance if not in session state
-#     if 'bedrock_chat' not in st.session_state:
-#         st.session_state.bedrock_chat = BedrockChat()
+    # Initialize GroqChat instance if not in session state
+    if 'groq_chat' not in st.session_state:
+        st.session_state.groq_chat = GroqChat()
 
-#     # Introduction text
-#     st.markdown("""
-#     Start by exploring Nova's base Japanese language capabilities. Try asking questions about Japanese grammar, 
-#     vocabulary, or cultural aspects.
-#     """)
+    # Introduction text
+    st.markdown("""
+    Start by exploring Groq's base Portuguese language capabilities. Try asking questions about Portuguese grammar, 
+    vocabulary, or cultural aspects.
+    """)
 
-#     # Initialize chat history if not exists
-#     if "messages" not in st.session_state:
-#         st.session_state.messages = []
+    # Initialize chat history if not exists
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-#     # Display chat messages
-#     for message in st.session_state.messages:
-#         with st.chat_message(message["role"], avatar="🧑‍💻" if message["role"] == "user" else "🤖"):
-#             st.markdown(message["content"])
+    # Display chat messages
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"], avatar="🧑‍💻" if message["role"] == "user" else "🤖"):
+            st.markdown(message["content"])
 
-#     # Chat input area
-#     if prompt := st.chat_input("Ask about Japanese language..."):
-#         # Process the user input
-#         process_message(prompt)
+    # Chat input area
+    if prompt := st.chat_input("Ask about Portuguese language..."):
+        # Process the user input
+        process_message(prompt)
 
-#     # Example questions in sidebar
-#     with st.sidebar:
-#         st.markdown("### Try These Examples")
-#         example_questions = [
-#             "How do I say 'Where is the train station?' in Japanese?",
-#             "Explain the difference between は and が",
-#             "What's the polite form of 食べる?",
-#             "How do I count objects in Japanese?",
-#             "What's the difference between こんにちは and こんばんは?",
-#             "How do I ask for directions politely?"
-#         ]
+    # Example questions in sidebar
+    with st.sidebar:
+        st.markdown("### Try These Examples")
+        example_questions = [
+            "How do I say 'Where is the nearest metro?' in Portuguese?",
+            "Explain the difference between 'ser' and 'estar'",
+            "What's the polite form of 'você'?",
+            "How do I use plural forms in Portuguese?",
+            "What's the difference between 'bom dia' and 'boa tarde'?",
+            "How do I order food politely in Portuguese?"
+        ]
         
-#         for q in example_questions:
-#             if st.button(q, use_container_width=True, type="secondary"):
-#                 # Process the example question
-#                 process_message(q)
-#                 st.rerun()
+        for q in example_questions:
+            if st.button(q, use_container_width=True, type="secondary"):
+                # Process the example question
+                process_message(q)
+                st.rerun()
 
-#     # Add a clear chat button
-#     if st.session_state.messages:
-#         if st.button("Clear Chat", type="primary"):
-#             st.session_state.messages = []
-#             st.rerun()
+    # Add a clear chat button
+    if st.session_state.messages:
+        if st.button("Clear Chat", type="primary"):
+            st.session_state.messages = []
+            st.rerun()
 
 def process_message(message: str):
     """Process a message and generate a response"""
@@ -156,7 +158,7 @@ def process_message(message: str):
 
     # Generate and display assistant's response
     with st.chat_message("assistant", avatar="🤖"):
-        response = st.session_state.bedrock_chat.generate_response(message)
+        response = st.session_state.groq_chat.generate_response(message)
         if response:
             st.markdown(response)
             st.session_state.messages.append({"role": "assistant", "content": response})
@@ -307,7 +309,7 @@ def main():
     
     # Render appropriate stage
     if selected_stage == "1. Chat with Nova":
-        st.info("chat will be here") # render_chat_stage()
+        render_chat_stage()
     elif selected_stage == "2. Raw Transcript":
         render_transcript_stage()
     elif selected_stage == "3. Structured Data":
