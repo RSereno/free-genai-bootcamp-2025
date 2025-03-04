@@ -26,7 +26,7 @@ if 'messages' not in st.session_state:
 
 def render_header():
     """Render the header section"""
-    st.title("🇵🇹 Portuguese Learning Assistant")
+    st.title("Portuguese Learning Assistant")
     st.markdown("""
     Transform YouTube transcripts into interactive Portuguese learning experiences.
     
@@ -308,7 +308,7 @@ def main():
     selected_stage = render_sidebar()
     
     # Render appropriate stage
-    if selected_stage == "1. Chat with Nova":
+    if selected_stage == "1. Chat with Groq":
         render_chat_stage()
     elif selected_stage == "2. Raw Transcript":
         render_transcript_stage()
