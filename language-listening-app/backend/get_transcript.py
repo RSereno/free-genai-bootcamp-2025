@@ -76,7 +76,7 @@ def main(video_url, print_transcript=False):
     
     # Get transcript
     transcript = downloader.get_transcript(video_url)
-    
+
     if transcript:
         # Save transcript
         video_id = downloader.extract_video_id(video_url)
@@ -94,6 +94,6 @@ def main(video_url, print_transcript=False):
         print("Failed to get transcript")
 
 if __name__ == "__main__":
-    video_id = "https://www.youtube.com/watch?v=sY7L5cfCWno&list=PLkGU7DnOLgRMl-h4NxxrGbK-UdZHIXzKQ"  # Extract from URL: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    video_id = "https://www.youtube.com/watch?v=oonIJ7LfNFE"  # Extract from URL: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     transcript = main(video_id, print_transcript=True)
         

@@ -1,2 +1,4 @@
 chromadb
 streamlit
+groq
+youtube_transcript_api
