@@ -9,6 +9,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.chat import GroqChat
+from backend.get_transcript import YouTubeTranscriptDownloader
 
 
 # Page config
