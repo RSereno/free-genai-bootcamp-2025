@@ -1,0 +1,16 @@
+{
+  "introduction": "[Extracted introduction text]",
+  "conversation": "[Extracted conversation or setup text]",
+  "questions": [
+    {
+      "question": "[Extracted question text]",
+      "options": [
+        "1. [First option]",
+        "2. [Second option]",
+        "3. [Third option]",
+        "4. [Fourth option]"
+      ]
+    }
+  ],
+  "conclusion": "[Extracted concluding text]"
+}

@@ -63,3 +63,7 @@ streamlit run frontend/main.py
 ```
 
 
+### Technical uncertainity
+Q: The transcript of some of the videos I tried dont seem to bring the Portuguese text on them. Or its completely gibberish will have to take another route. Keeping the Japanese version for now.
+
+A: There seems to be one of the attributes that defines the language to get extracted.

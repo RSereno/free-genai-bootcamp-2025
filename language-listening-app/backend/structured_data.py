@@ -2,6 +2,10 @@ import os
 import re
 from typing import List, Dict
 from groq import Groq
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Model ID
 MODEL_ID = "deepseek-r1-distill-llama-70b"
@@ -44,124 +48,44 @@ class TranscriptProcessor:
         ]
 
         if self.groq_client:
-            # Use Groq to determine the structure
-            prompt = f"""
-            You are an expert in structuring transcripts of Japanese Language Proficiency Test (JLPT) listening tests. Your task is to analyze the given transcript and extract specific sections based on their question format.
+            # Convert cleaned_transcript to a string representation
+            transcript_str = "\n".join(entry["text"] for entry in cleaned_transcript)
+            
+            # Load JSON template
+            template_path = os.path.join(os.path.dirname(__file__), 'templates', 'structuredata.json')
+            with open(template_path, 'r') as f:
+                json_template = f.read()
+            
+            prompt = f"""You are an expert in structuring transcripts of spoken European Portuguese. Your task is to analyze the given transcript and extract key sections to generate structured question-based learning content.  
+            Identify and extract the following sections:  
 
-            Here are the section extraction rules:
+1. **Introduction**:  
+   - Extract the initial part of the transcript where the speaker(s) introduce themselves, the topic, or the purpose of the recording.  
 
-            For 問題1:
-            Extract questions where the answer can be determined solely from the conversation without needing visual aids.
+2. **Conversation**:  
+   - Extract any conversational setup before questions are asked.  
 
-            ONLY include questions that meet these criteria:
-            - The answer can be determined purely from the spoken dialogue.
-            - No spatial/visual information is needed (like locations, layouts, or physical appearances).
-            - No physical objects or visual choices need to be compared.
+3. **Questions & Answers**:  
+   - Identify questions posed within the transcript.  
+   - Extract corresponding multiple-choice answer options.  
+   - Ensure each question is properly paired with its answer choices.  
 
-            For example, INCLUDE questions about:
-            - Times and dates
-            - Numbers and quantities
-            - Spoken choices or decisions
-            - Clear verbal directions
+4. **Conclusion**:  
+   - Extract the final part of the transcript where the speaker(s) summarize the content or provide closing remarks.  
 
-            DO NOT include questions about:
-            - Physical locations that need a map or diagram
-            - Visual choices between objects
-            - Spatial arrangements or layouts
-            - Physical appearances of people or things
+**Format the extracted content as JSON:**  
 
-            Format each question exactly like this:
+{json_template}
 
-            <question>
-            Introduction:
-            [the situation setup in japanese]
+#### **Rules:**  
+- **Do not translate any Portuguese text.**  
+- **Analyze the entire transcript carefully to extract each section.**  
+- **If a section type is not clearly identifiable, return it as an empty string (`""`) or an empty list (`[]`).**  
+- **Maintain the original structure of the transcript while organizing it into JSON format.**  
 
-            Conversation:
-            [the dialogue in japanese]
-
-            Question:
-            [the question being asked in japanese]
-
-            Options:
-            1. [first option in japanese]
-            2. [second option in japanese]
-            3. [third option in japanese]
-            4. [fourth option in japanese]
-            </question>
-
-            Rules:
-            - Only extract questions from the 問題1 section
-            - Only include questions where answers can be determined from dialogue alone
-            - Ignore any practice examples (marked with 例)
-            - Do not translate any Japanese text
-            - Do not include any section descriptions or other text
-            - Output questions one after another with no extra text between them
-
-            For 問題2:
-            Extract questions where the answer can be determined solely from the conversation without needing visual aids.
-
-            ONLY include questions that meet these criteria:
-            - The answer can be determined purely from the spoken dialogue
-            - No spatial/visual information is needed (like locations, layouts, or physical appearances)
-            - No physical objects or visual choices need to be compared
-
-            For example, INCLUDE questions about:
-            - Times and dates
-            - Numbers and quantities
-            - Spoken choices or decisions
-            - Clear verbal directions
-
-            DO NOT include questions about:
-            - Physical locations that need a map or diagram
-            - Visual choices between objects
-            - Spatial arrangements or layouts
-            - Physical appearances of people or things
-
-            Format each question exactly like this:
-
-            <question>
-            Introduction:
-            [the situation setup in japanese]
-
-            Conversation:
-            [the dialogue in japanese]
-
-            Question:
-            [the question being asked in japanese]
-            </question>
-
-            Rules:
-            - Only extract questions from the 問題2 section
-            - Only include questions where answers can be determined from dialogue alone
-            - Ignore any practice examples (marked with 例)
-            - Do not translate any Japanese text
-            - Do not include any section descriptions or other text
-            - Output questions one after another with no extra text between them
-
-            For 問題3:
-            Extract all questions.
-            Format each question exactly like this:
-
-            <question>
-            Situation:
-            [the situation in japanese where a phrase is needed]
-
-            Question:
-            何と言いますか
-            </question>
-
-            Rules:
-            - Only extract questions from the 問題3 section
-            - Ignore any practice examples (marked with 例)
-            - Do not translate any Japanese text
-            - Do not include any section descriptions or other text
-            - Output questions one after another with no extra text between them
-
-            Here is the transcript to analyze:
-            {cleaned_transcript}
-
-            Return a JSON object with keys 'mondai1', 'mondai2', and 'mondai3', each containing a list of extracted questions for the corresponding section. If a section is not present or no questions are extracted, the value should be an empty list.
-            """
+Here is the transcript to analyze:  
+{transcript_str}
+"""
             try:
                 chat_completion = self.groq_client.chat.completions.create(
                     messages=[
@@ -184,24 +108,27 @@ class TranscriptProcessor:
                     print(f"Error decoding JSON from Groq: {response_text}")
                     # Fallback to basic logic if JSON decoding fails
                     return {
-                        'mondai1': [],
-                        'mondai2': [],
-                        'mondai3': []
+                        'introduction': [],
+                        'dialogue': [],
+                        'topic_discussion': [],
+                        'conclusion': []
                     }
             except Exception as e:
                 print(f"Error during Groq API call: {e}")
                 # Fallback to basic logic if Groq API call fails
                 return {
-                    'mondai1': [],
-                    'mondai2': [],
-                    'mondai3': []
+                    'introduction': [],
+                    'dialogue': [],
+                    'topic_discussion': [],
+                    'conclusion': []
                 }
         else:
             print("Groq API key not set. Skipping Groq processing.")
             return {
-                'mondai1': [],
-                'mondai2': [],
-                'mondai3': []
+                'introduction': [],
+                'dialogue': [],
+                'topic_discussion': [],
+                'conclusion': []
             }
 
     def process_transcript(self, transcript_path: str) -> Dict:
@@ -226,7 +153,7 @@ class TranscriptProcessor:
 if __name__ == '__main__':
     groq_api_key = os.getenv("GROQ_API_KEY")  
     processor = TranscriptProcessor(groq_api_key=groq_api_key)
-    processed_data = processor.process_transcript("transcripts/sY7L5cfCWno.txt")
+    processed_data = processor.process_transcript("transcripts/sX6xBrSb-TU.txt")
     
     print("Processed Data:")
     print(processed_data)
