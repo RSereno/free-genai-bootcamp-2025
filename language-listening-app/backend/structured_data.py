@@ -1,5 +1,6 @@
 import os
 import re
+import json
 from typing import List, Dict
 from groq import Groq
 from dotenv import load_dotenv
@@ -11,11 +12,11 @@ load_dotenv()
 MODEL_ID = "deepseek-r1-distill-llama-70b"
 
 class TranscriptProcessor:
-    def __init__(self, groq_api_key: str = None):
-        self.groq_api_key = groq_api_key
-        if groq_api_key:
+    def __init__(self):
+        self.groq_api_key = os.getenv("GROQ_API_KEY")
+        if self.groq_api_key:
             print("Groq:")
-            self.groq_client = Groq(api_key=groq_api_key)
+            self.groq_client = Groq(api_key=self.groq_api_key)
         else:
             print("No Groq:")
             self.groq_client = None
@@ -38,6 +39,20 @@ class TranscriptProcessor:
             text = self.clean_text(entry['text'])
             dialogue.append({'text': text})
         return dialogue
+
+    def extract_json_from_response(self, response_text: str) -> str:
+        """Extract JSON from LLM response text."""
+        # Try to find JSON between triple backticks
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response_text, re.DOTALL)
+        if json_match:
+            return json_match.group(1)
+        
+        # If no backticks, try to find first { and last }
+        json_match = re.search(r'(\{.*\})', response_text, re.DOTALL)
+        if json_match:
+            return json_match.group(1)
+        
+        return response_text
 
     def structure_data(self, transcript: List[Dict]) -> Dict:
         """
@@ -99,19 +114,23 @@ Here is the transcript to analyze:
                     max_tokens=4096,
                 )
                 response_text = chat_completion.choices[0].message.content
-                # Parse the JSON response from Groq
-                import json
+                # Clean and parse the JSON response from Groq
                 try:
-                    structured_data = json.loads(response_text)
+                    cleaned_response = self.extract_json_from_response(response_text)
+                    print("Attempting to parse JSON response:")
+                    print(cleaned_response)
+                    structured_data = json.loads(cleaned_response)
                     return structured_data
-                except json.JSONDecodeError:
-                    print(f"Error decoding JSON from Groq: {response_text}")
-                    # Fallback to basic logic if JSON decoding fails
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON from Groq: {str(e)}")
+                    print("Raw response:")
+                    print(response_text)
+                    # Fallback to basic structure
                     return {
-                        'introduction': [],
-                        'dialogue': [],
-                        'topic_discussion': [],
-                        'conclusion': []
+                        'introduction': "",
+                        'conversation': "",
+                        'questions': [],
+                        'conclusion': ""
                     }
             except Exception as e:
                 print(f"Error during Groq API call: {e}")
@@ -150,9 +169,8 @@ Here is the transcript to analyze:
             'structured_data': structured_data
         }
 
-if __name__ == '__main__':
-    groq_api_key = os.getenv("GROQ_API_KEY")  
-    processor = TranscriptProcessor(groq_api_key=groq_api_key)
+if __name__ == '__main__':  
+    processor = TranscriptProcessor()
     processed_data = processor.process_transcript("transcripts/sX6xBrSb-TU.txt")
     
     print("Processed Data:")

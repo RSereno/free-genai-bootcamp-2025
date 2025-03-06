@@ -10,7 +10,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.chat import GroqChat
 from backend.get_transcript import YouTubeTranscriptDownloader
+from backend.structured_data import TranscriptProcessor
 
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Page config
 st.set_page_config(
@@ -164,22 +169,12 @@ def process_message(message: str):
             st.markdown(response)
             st.session_state.messages.append({"role": "assistant", "content": response})
 
-
-
 def count_characters(text):
-    """Count Japanese and total characters in text"""
+    """Count total characters in text"""
     if not text:
-        return 0, 0
+        return 0
         
-    def is_japanese(char):
-        return any([
-            '\u4e00' <= char <= '\u9fff',  # Kanji
-            '\u3040' <= char <= '\u309f',  # Hiragana
-            '\u30a0' <= char <= '\u30ff',  # Katakana
-        ])
-    
-    jp_chars = sum(1 for char in text if is_japanese(char))
-    return jp_chars, len(text)
+    return len(text)
 
 def render_transcript_stage():
     """Render the raw transcript stage"""
@@ -188,7 +183,7 @@ def render_transcript_stage():
     # URL input
     url = st.text_input(
         "YouTube URL",
-        placeholder="Enter a Japanese lesson YouTube URL"
+        placeholder="Enter a Portuguese lesson YouTube URL"
     )
     
     # Download button and processing
@@ -226,12 +221,11 @@ def render_transcript_stage():
         st.subheader("Transcript Stats")
         if st.session_state.transcript:
             # Calculate stats
-            jp_chars, total_chars = count_characters(st.session_state.transcript)
+            total_chars = count_characters(st.session_state.transcript)
             total_lines = len(st.session_state.transcript.split('\n'))
             
             # Display stats
             st.metric("Total Characters", total_chars)
-            st.metric("Japanese Characters", jp_chars)
             st.metric("Total Lines", total_lines)
         else:
             st.info("Load a transcript to see statistics")
@@ -244,13 +238,31 @@ def render_structured_stage():
     
     with col1:
         st.subheader("Dialogue Extraction")
-        # Placeholder for dialogue processing
-        st.info("Dialogue extraction will be implemented here")
+        if st.session_state.transcript:
+            # Process transcript and extract dialogue
+            processor = TranscriptProcessor()
+            
+            # Convert transcript string to list of dicts
+            transcript_list = [{'text': line} for line in st.session_state.transcript.split('\n')]
+            
+            dialogue = processor.extract_dialogue(transcript_list)
+            st.write(dialogue)
+        else:
+            st.info("No transcript loaded yet. Please go to 'Raw Transcript' stage.")
         
     with col2:
         st.subheader("Data Structure")
-        # Placeholder for structured data view
-        st.info("Structured data view will be implemented here")
+        if st.session_state.transcript:
+            # Process transcript and structure data
+            processor = TranscriptProcessor()
+            
+            # Convert transcript string to list of dicts
+            transcript_list = [{'text': line} for line in st.session_state.transcript.split('\n')]
+            
+            structured_data = processor.structure_data(transcript_list)
+            st.write(structured_data)
+        else:
+            st.info("No transcript loaded yet. Please go to 'Raw Transcript' stage.")
 
 def render_rag_stage():
     """Render the RAG implementation stage"""
