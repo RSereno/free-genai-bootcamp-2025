@@ -70,3 +70,5 @@ wheels/
 
 # Project specific
 language-listening-app/backend/transcripts/*
+
+personalNotes.md

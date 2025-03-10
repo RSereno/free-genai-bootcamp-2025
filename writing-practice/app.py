@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+from services.sentence_generator import SentenceGenerator
 
 # Function to fetch word collection (mocked since backend is ignored)
 def fetch_words(id):
@@ -24,10 +25,20 @@ if "submission" not in st.session_state:
 def generate_sentence():
     if st.session_state.words:
         word = random.choice(st.session_state.words)["english"]
-        # Mock sentence using the selected word
-        sentence = f"I see a {word} today."
-        st.session_state.current_sentence = sentence
-        st.session_state.app_state = "Practice"
+        print("\n=== Starting Sentence Generation ===")
+        print(f"Selected word: {word}")
+        try:
+            generator = SentenceGenerator()
+            sentence = generator.generate_sentence(word)
+            print(f"Generated sentence: {sentence}")
+            st.session_state.current_sentence = sentence
+            st.session_state.app_state = "Practice"
+        except Exception as e:
+            print(f"Error in app.py: {str(e)}")
+            sentence = f"I see a {word} today. Mock"  # Fallback to simple sentence
+            st.session_state.current_sentence = sentence
+            st.session_state.app_state = "Practice"
+        print("=== End Sentence Generation ===\n")
     else:
         st.error("No words available to generate a sentence.")
 
