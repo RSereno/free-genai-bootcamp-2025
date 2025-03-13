@@ -19,7 +19,7 @@ func GetAllWordReviewItems(db *sql.DB) ([]models.WordReviewItem, error) {
 	var wordReviewItems []models.WordReviewItem
 	for rows.Next() {
 		var wordReviewItem models.WordReviewItem
-		if err := rows.Scan(&wordReviewItem.ID, &wordReviewItem.StudyActivityID, &wordReviewItem.WordID, &wordReviewItem.IsCorrect); err != nil {
+		if err := rows.Scan(&wordReviewItem.ID, &wordReviewItem.StudySessionID, &wordReviewItem.WordID, &wordReviewItem.Correct); err != nil {
 			log.Println("Error scanning word review item row:", err)
 			continue
 		}
@@ -38,7 +38,7 @@ func GetWordReviewItemByID(db *sql.DB, id int) (*models.WordReviewItem, error) {
 	row := db.QueryRow("SELECT id, study_activity_id, word_id, is_correct FROM word_review_items WHERE id = ?", id)
 
 	var wordReviewItem models.WordReviewItem
-	err := row.Scan(&wordReviewItem.ID, &wordReviewItem.StudyActivityID, &wordReviewItem.WordID, &wordReviewItem.IsCorrect)
+	err := row.Scan(&wordReviewItem.ID, &wordReviewItem.StudySessionID, &wordReviewItem.WordID, &wordReviewItem.Correct)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // Word review item not found
@@ -52,7 +52,7 @@ func GetWordReviewItemByID(db *sql.DB, id int) (*models.WordReviewItem, error) {
 // CreateWordReviewItem creates a new word review item in the database.
 func CreateWordReviewItem(db *sql.DB, wordReviewItem *models.WordReviewItem) (int, error) {
 	result, err := db.Exec("INSERT INTO word_review_items (study_activity_id, word_id, is_correct) VALUES (?, ?, ?)",
-		wordReviewItem.StudyActivityID, wordReviewItem.WordID, wordReviewItem.IsCorrect)
+		wordReviewItem.StudySessionID, wordReviewItem.WordID, wordReviewItem.Correct)
 	if err != nil {
 		return 0, fmt.Errorf("failed to create word review item: %w", err)
 	}
@@ -68,7 +68,7 @@ func CreateWordReviewItem(db *sql.DB, wordReviewItem *models.WordReviewItem) (in
 // UpdateWordReviewItem updates an existing word review item in the database.
 func UpdateWordReviewItem(db *sql.DB, wordReviewItem *models.WordReviewItem) error {
 	result, err := db.Exec("UPDATE word_review_items SET study_activity_id = ?, word_id = ?, is_correct = ? WHERE id = ?",
-		wordReviewItem.StudyActivityID, wordReviewItem.WordID, wordReviewItem.IsCorrect, wordReviewItem.ID)
+		wordReviewItem.StudySessionID, wordReviewItem.WordID, wordReviewItem.Correct, wordReviewItem.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update word review item: %w", err)
 	}
