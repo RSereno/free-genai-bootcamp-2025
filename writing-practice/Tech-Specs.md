@@ -1,4 +1,14 @@
 # Technical Specs
+## Prerequisites
+Make sure Tesseract is installed on your system:
+
+Ubuntu/Debian: sudo apt-get install tesseract-ocr tesseract-ocr-por
+MacOS: brew install tesseract tesseract-lang
+Windows: Download and install from Github
+For better Portuguese recognition, you may need to download the Portuguese language data:
+
+The language pack 'por' should be installed with Tesseract
+You can verify available languages with: pytesseract.get_languages()
 
 ## Initialization Step
 When the app first initializes it needs to the following:
@@ -100,6 +110,7 @@ Grade scale and criteria:
 1. The `/api/words_groups/:id/study_sessions/raw` endpoint needs to be implemented in the Go backend
 2. Expected response format is already defined in the API Endpoints section
 3. This endpoint should return a curated list of word pairs for study sessions
+
 
 ## Techincal Uncertainity
  Q: I dont seem to have the "raw" endpoint in the GO backend will have to make the decision if I quickly implement it or fall back to the flask version.

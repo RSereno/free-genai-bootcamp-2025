@@ -1,3 +1,5 @@
 groq
 dotenv
 requests
+pytesseract 
+Pillow opencv-python

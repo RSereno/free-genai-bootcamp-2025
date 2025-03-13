@@ -3,6 +3,11 @@ import random
 from services.sentence_generator import SentenceGenerator
 from dotenv import load_dotenv
 import requests
+import pytesseract
+from PIL import Image
+import numpy as np
+import cv2
+import io
 
 # Load environment variables
 load_dotenv()
@@ -75,19 +80,43 @@ def submit_for_review(image):
         # Check image size (max 5MB)
         if len(image.getvalue()) > 5 * 1024 * 1024:
             st.error("Image size exceeds 5MB. Please upload a smaller image.")
-        else:
-            # Mock grading response
-            transcription = "Eu vejo um gato hoje."  # Mock Portuguese translation
-            translation = "I see a cat today."     # Mock English translation
-            grade = "S"                              # Mock grade
-            description = "Perfect match - Translation is exactly as expected"
+            return
+
+        try:
+            # Convert uploaded file to image
+            image_bytes = image.getvalue()
+            nparr = np.frombuffer(image_bytes, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            
+            # Preprocess image for better OCR
+            # Convert to grayscale
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # Apply thresholding to preprocess the image
+            gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+            
+            # Convert to PIL Image for Tesseract
+            pil_img = Image.fromarray(gray)
+            
+            # Perform OCR with Portuguese language support
+            transcription = pytesseract.image_to_string(pil_img, lang='por')
+            transcription = transcription.strip()  # Remove extra whitespace
+            
+            # For now, use simple mock translation and grading
+            translation = st.session_state.current_sentence  # Original English sentence
+            grade = "A"  # Mock grade
+            description = "Text successfully extracted. Please verify the transcription."
+            
             st.session_state.submission = {
                 "transcription": transcription,
                 "translation": translation,
                 "grade": grade,
-                "description": description
+                "description": description,
+                "image": image  # Store image for display in review
             }
             st.session_state.app_state = "Review"
+            
+        except Exception as e:
+            st.error(f"Error processing image: {str(e)}")
     else:
         st.error("Please upload an image before submitting.")
 
@@ -117,8 +146,13 @@ elif st.session_state.app_state == "Review":
     ### Review State ###
     st.write("Here is the review of your submission:")
     st.write(f"**Original Sentence:** {st.session_state.current_sentence}")
-    st.write(f"**Transcription:** {st.session_state.submission['transcription']}")
-    st.write(f"**Translation:** {st.session_state.submission['translation']}")
+    
+    # Display the uploaded image
+    if "image" in st.session_state.submission:
+        st.image(st.session_state.submission["image"], caption="Your submission", use_column_width=True)
+    
+    st.write(f"**OCR Transcription:** {st.session_state.submission['transcription']}")
+    st.write(f"**Expected Translation:** {st.session_state.submission['translation']}")
     st.write(f"**Grade:** {st.session_state.submission['grade']}")
     st.write(f"**Description:** {st.session_state.submission['description']}")
     st.button("Next Question", on_click=next_question)

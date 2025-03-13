@@ -1,4 +1,11 @@
-func GetStudySessionWords(db *sql.DB, sessionID, page, limit int) ([]struct {
+package db
+
+import (
+	"database/sql"
+	"time"
+)
+
+func FetchStudySessionWords(db *sql.DB, sessionID, page, limit int) ([]struct {
 	ID             int    `json:"id"`
 	English        string `json:"english"`
 	Portuguese     string `json:"portuguese"`
@@ -64,82 +71,7 @@ func GetStudySessionWords(db *sql.DB, sessionID, page, limit int) ([]struct {
 	return words, totalItems, rows.Err()
 }
 
-func GetStudySessionWordsRaw(db *sql.DB, sessionID, page, limit int) ([]struct {
-	ID         int       `json:"id"`
-	WordID     int       `json:"word_id"`
-	English    string    `json:"english"`
-	Portuguese string    `json:"portuguese"`
-	IsCorrect  bool      `json:"is_correct"`
-	CreatedAt  time.Time `json:"created_at"`
-}, int, error) {
-	offset := (page - 1) * limit
-
-	// First get total count
-	var totalItems int
-	err := db.QueryRow(`
-        SELECT COUNT(*)
-        FROM word_review_items wri
-        WHERE wri.study_session_id = ?`, sessionID).Scan(&totalItems)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	// Then get paginated results with word details
-	query := `
-        SELECT 
-            wri.id,
-            w.id as word_id,
-            w.english,
-            w.portuguese,
-            wri.is_correct,
-            wri.created_at
-        FROM word_review_items wri
-        JOIN words w ON w.id = wri.word_id
-        WHERE wri.study_session_id = ?
-        ORDER BY wri.created_at DESC
-        LIMIT ? OFFSET ?`
-
-	rows, err := db.Query(query, sessionID, limit, offset)
-	if err != nil {
-		return nil, 0, err
-	}
-	defer rows.Close()
-
-	var reviews []struct {
-		ID         int       `json:"id"`
-		WordID     int       `json:"word_id"`
-		English    string    `json:"english"`
-		Portuguese string    `json:"portuguese"`
-		IsCorrect  bool      `json:"is_correct"`
-		CreatedAt  time.Time `json:"created_at"`
-	}
-
-	for rows.Next() {
-		var review struct {
-			ID         int       `json:"id"`
-			WordID     int       `json:"word_id"`
-			English    string    `json:"english"`
-			Portuguese string    `json:"portuguese"`
-			IsCorrect  bool      `json:"is_correct"`
-			CreatedAt  time.Time `json:"created_at"`
-		}
-		if err := rows.Scan(
-			&review.ID,
-			&review.WordID,
-			&review.English,
-			&review.Portuguese,
-			&review.IsCorrect,
-			&review.CreatedAt,
-		); err != nil {
-			return nil, 0, err
-		}
-		reviews = append(reviews, review)
-	}
-
-	return reviews, totalItems, rows.Err()
-}
-
-func GetWordGroupStudySessions(db *sql.DB, groupID, page, limit int) ([]struct {
+func FetchWordGroupStudySessions(db *sql.DB, groupID, page, limit int) ([]struct {
 	ID              int       `json:"id"`
 	CreatedAt       time.Time `json:"created_at"`
 	ActivityName    string    `json:"activity_name"`
@@ -226,7 +158,7 @@ func GetWordGroupStudySessions(db *sql.DB, groupID, page, limit int) ([]struct {
 	return sessions, totalItems, rows.Err()
 }
 
-func GetWordGroupStudySessionsRaw(db *sql.DB, groupID, page, limit int) ([]struct {
+func GetWordGroupStudySessionsDetails(db *sql.DB, groupID, page, limit int) ([]struct {
 	ID              int       `json:"id"`
 	CreatedAt       time.Time `json:"created_at"`
 	ActivityName    string    `json:"activity_name"`
