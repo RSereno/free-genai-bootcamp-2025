@@ -53,6 +53,10 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/api/words_groups", createWordsGroupsHandler)
 	router.PUT("/api/words_groups/:id", updateWordsGroupsHandler)
 	router.DELETE("/api/words_groups/:id", deleteWordsGroupsHandler)
+	router.GET("/api/study_sessions/:id/words", getStudySessionWordsHandler)
+	router.GET("/api/study_sessions/:id/words/raw", getStudySessionWordsRawHandler)
+	router.GET("/api/words_groups/:id/study_sessions", getWordGroupStudySessionsHandler)
+	router.GET("/api/words_groups/:id/study_sessions/raw", getWordGroupStudySessionsRawHandler)
 }
 
 func main() {
@@ -740,4 +744,176 @@ func deleteWordsGroupsHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "WordsGroups deleted successfully"})
+}
+
+// getStudySessionWordsHandler handles GET /api/study_sessions/:id/words endpoint
+func getStudySessionWordsHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "100"))
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid study session ID"})
+		return
+	}
+
+	// First verify if the study session exists
+	session, err := db.GetStudySessionByID(dbConn, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch study session"})
+		return
+	}
+	if session == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Study session not found"})
+		return
+	}
+
+	// Get reviewed words for this session with pagination
+	words, totalItems, err := db.GetStudySessionWords(dbConn, id, page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reviewed words"})
+		return
+	}
+
+	totalPages := (totalItems + limit - 1) / limit
+
+	c.JSON(http.StatusOK, gin.H{
+		"items": words,
+		"pagination": gin.H{
+			"page_number": page,
+			"page_size":   limit,
+			"total_pages": totalPages,
+			"total_items": totalItems,
+		},
+	})
+}
+
+// getStudySessionWordsRawHandler handles GET /api/study_sessions/:id/words/raw endpoint
+func getStudySessionWordsRawHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "100"))
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid study session ID"})
+		return
+	}
+
+	// First verify if the study session exists
+	session, err := db.GetStudySessionByID(dbConn, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch study session"})
+		return
+	}
+	if session == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Study session not found"})
+		return
+	}
+
+	// Get raw word review data for this session with pagination
+	wordReviews, totalItems, err := db.GetStudySessionWordsRaw(dbConn, id, page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch word reviews"})
+		return
+	}
+
+	totalPages := (totalItems + limit - 1) / limit
+
+	c.JSON(http.StatusOK, gin.H{
+		"items": wordReviews,
+		"pagination": gin.H{
+			"page_number": page,
+			"page_size":   limit,
+			"total_pages": totalPages,
+			"total_items": totalItems,
+		},
+	})
+}
+
+// getWordGroupStudySessionsHandler handles GET /api/words_groups/:id/study_sessions endpoint
+func getWordGroupStudySessionsHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "100"))
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	// First verify if the group exists
+	group, err := db.GetGroupByID(dbConn, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch group"})
+		return
+	}
+	if group == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Group not found"})
+		return
+	}
+
+	// Get study sessions for this group with pagination
+	sessions, totalItems, err := db.GetWordGroupStudySessions(dbConn, id, page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch study sessions"})
+		return
+	}
+
+	totalPages := (totalItems + limit - 1) / limit
+
+	c.JSON(http.StatusOK, gin.H{
+		"items": sessions,
+		"pagination": gin.H{
+			"page_number": page,
+			"page_size":   limit,
+			"total_pages": totalPages,
+			"total_items": totalItems,
+		},
+	})
+}
+
+// getWordGroupStudySessionsRawHandler handles GET /api/words_groups/:id/study_sessions/raw endpoint
+func getWordGroupStudySessionsRawHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "100"))
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+		return
+	}
+
+	// First verify if the group exists
+	group, err := db.GetGroupByID(dbConn, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch group"})
+		return
+	}
+	if group == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Group not found"})
+		return
+	}
+
+	// Get raw study sessions for this group with pagination
+	sessions, totalItems, err := db.GetWordGroupStudySessionsRaw(dbConn, id, page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch study sessions"})
+		return
+	}
+
+	totalPages := (totalItems + limit - 1) / limit
+
+	c.JSON(http.StatusOK, gin.H{
+		"items": sessions,
+		"pagination": gin.H{
+			"page_number": page,
+			"page_size":   limit,
+			"total_pages": totalPages,
+			"total_items": totalItems,
+		},
+	})
 }

@@ -1,15 +1,42 @@
 import streamlit as st
 import random
 from services.sentence_generator import SentenceGenerator
+from dotenv import load_dotenv
+import requests
 
-# Function to fetch word collection (mocked since backend is ignored)
+# Load environment variables
+load_dotenv()
+
+# Function to fetch word collection
 def fetch_words(id):
-    # Mock data: list of Portuguese-English word pairs
-    return [
-        {"portuguese": "casa", "english": "house"},
-        {"portuguese": "carro", "english": "car"},
-        {"portuguese": "gato", "english": "cat"}
-    ]
+    """Fetch words from a specific group via the backend API"""
+    try:
+        # Call the backend API
+        response = requests.get(f"http://localhost:8080/api/words_groups/{id}/words", 
+                              params={"page": 1, "limit": 100})
+        response.raise_for_status()  # Raise exception for 4xx or 5xx status codes
+        
+        # Parse the response
+        data = response.json()
+        
+        # Transform the data into the expected format
+        word_list = []
+        for word in data.get("items", []):
+            word_list.append({
+                "portuguese": word["portuguese"],
+                "english": word["english"]
+            })
+        
+        return word_list
+
+    except requests.RequestException as e:
+        print(f"Error fetching words from API: {e}")
+        # Return mock data as fallback
+        return [
+            {"portuguese": "casa", "english": "house"},
+            {"portuguese": "carro", "english": "car"},
+            {"portuguese": "gato", "english": "cat"}
+        ]
 
 # Initialize session state variables
 if "app_state" not in st.session_state:
