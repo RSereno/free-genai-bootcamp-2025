@@ -126,11 +126,11 @@ def next_question():
     generate_sentence()               # Generate new sentence and go to Practice
 
 # Main application logic
-st.title("Language Learning App")
+st.title("Writing Sentence Learning App")
 
 if st.session_state.app_state == "Setup":
     ### Setup State ###
-    st.write("Welcome to the Language Learning App!")
+    st.write("Welcome to the Writing Sentence Learning App!")
     st.write("Click the button below to generate a sentence and start practicing.")
     st.button("Generate Sentence", on_click=generate_sentence)
 
