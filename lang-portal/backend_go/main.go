@@ -66,7 +66,7 @@ func main() {
 	SetupRoutes(router) // Now uses the shared function
 
 	// Start the server and handle errors
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":5000"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
