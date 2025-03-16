@@ -20,7 +20,7 @@ func TestCreateWord(t *testing.T) {
 		WithArgs("test", "teste", "noun").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	id, err := db.CreateWord(db, &models.Word{
+	id, err := CreateWord(db, &models.Word{
 		English:    "test",
 		Portuguese: "teste",
 		Parts:      "noun",
@@ -42,7 +42,7 @@ func TestGetAllWordsIntegration(t *testing.T) {
 		('goodbye', 'adeus', 'interjection')`)
 	require.NoError(t, err)
 
-	words, err := db.GetAllWords(db)
+	words, err := GetAllWords(db)
 	require.NoError(t, err)
 	assert.Len(t, words, 2)
 }
