@@ -86,6 +86,16 @@ By executing the command in the section "Run it locally", the model was download
     }'
     ```
 
+# UV enviroment
+https://docs.astral.sh/uv/#getting-started
+
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+uv venv vllm_source --python 3.12 --seed
+
+source vllm_source/bin/activate
+
+
 # Technical Uncertainty
 
 Q: Since we are putting some limitations on the container, will the API calls work as expected?  

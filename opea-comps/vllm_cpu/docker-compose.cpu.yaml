@@ -1,0 +1,29 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  vllm-openvino:
+    image: vllm-openvino:${TAG:-latest}
+    container_name: vllm-openvino
+    ports:
+      - ${LLM_ENDPOINT_PORT:-8008}:${LLM_ENDPOINT_PORT:-8008}
+    volumes:
+      - "${HF_CACHE_DIR:-$HOME/.cache/huggingface}:/root/.cache/huggingface"
+    environment:
+      HTTPS_PROXY: ${http_proxy}
+      HTTP_PROXY: ${https_proxy}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN} 
+      host_ip: ${host_ip}
+    entrypoint: /bin/bash -c " cd / && export VLLM_CPU_KVCACHE_SPACE=50 && python3 -m vllm.entrypoints.openai.api_server --disable-frontend-multiprocessing  --model ${LLM_MODEL_ID}   --host 0.0.0.0  --port ${LLM_ENDPOINT_PORT}"
+    ipc: host
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+
+networks:
+  default:
+    driver: bridge
