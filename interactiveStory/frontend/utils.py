@@ -11,19 +11,13 @@ def display_scene(scene):
         for option in options:
             # Add a unique key to each button
             if st.button(option["text"], key=f"{option['text']}_{option['nextScene']}"):
+                if "hint" in option:  # Check if the option has a hint
+                    st.error("Wrong choice! Try again.")
+                    st.info(f"Hint: {option['hint']}")
+                    st.stop()  # Halt execution to ensure the error is displayed
                 st.session_state.scene_id = option["nextScene"]
                 st.session_state.points += option.get("points", 0)
                 st.rerun()
-        
-        # Display hint if available in the scene or options
-        hint = scene.get("hint")
-        if not hint:  # Check if hint is inside options
-            for option in options:
-                if "hint" in option:
-                    hint = option["hint"]
-                    break
-        if hint:
-            st.info(f"Hint: {hint}")
         
         # Display current points
         st.sidebar.write(f"🌟 Points: {st.session_state.points}")
