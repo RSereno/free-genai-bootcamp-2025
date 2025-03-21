@@ -1,0 +1,114 @@
+[
+    {
+        "id": "cafe_entrance",
+        "prompt": "Um empregado de mesa cumprimenta-o. O que você responde?",
+        "options": [
+            {
+                "text": "Quero um café, por favor.",
+                "nextScene": "waiter_serves_coffee",
+                "points": 10
+            },
+            {
+                "text": "Obrigado, adeus!",
+                "nextScene": "waiter_looks_confused",
+                "points": 0,
+                "hint": "Está a sair demasiado cedo!"
+            }
+        ]
+    },
+    {
+        "id": "waiter_serves_coffee",
+        "prompt": "O empregado serve-lhe um café quente. O que você faz?",
+        "options": [
+            {
+                "text": "Agradeço e começo a beber.",
+                "nextScene": "enjoy_coffee",
+                "points": 10
+            },
+            {
+                "text": "Reclamo que está muito quente.",
+                "nextScene": "waiter_apologizes",
+                "points": 5
+            }
+        ]
+    },
+    {
+        "id": "waiter_looks_confused",
+        "prompt": "O empregado olha para si, confuso. Ele pergunta se está tudo bem. O que você responde?",
+        "options": [
+            {
+                "text": "Peço desculpa e volto para pedir um café.",
+                "nextScene": "waiter_serves_coffee",
+                "points": 5
+            },
+            {
+                "text": "Digo que está tudo bem e saio.",
+                "nextScene": "exit_cafe",
+                "points": 0
+            }
+        ]
+    },
+    {
+        "id": "enjoy_coffee",
+        "prompt": "Você aprecia o café e sente-se revigorado. O que faz a seguir?",
+        "options": [
+            {
+                "text": "Peço a conta e saio.",
+                "nextScene": "pay_and_leave",
+                "points": 10
+            },
+            {
+                "text": "Peço outro café.",
+                "nextScene": "order_another_coffee",
+                "points": 5
+            }
+        ]
+    },
+    {
+        "id": "waiter_apologizes",
+        "prompt": "O empregado pede desculpa e oferece-lhe um café novo. O que você faz?",
+        "options": [
+            {
+                "text": "Aceito o novo café.",
+                "nextScene": "enjoy_coffee",
+                "points": 10
+            },
+            {
+                "text": "Recuso e saio.",
+                "nextScene": "exit_cafe",
+                "points": 0
+            }
+        ]
+    },
+    {
+        "id": "exit_cafe",
+        "prompt": "Você sai do café. Talvez volte outro dia.",
+        "options": []
+    },
+    {
+        "id": "pay_and_leave",
+        "prompt": "Você paga a conta e sai satisfeito. Fim da história.",
+        "options": []
+    },
+    {
+        "id": "order_another_coffee",
+        "prompt": "O empregado traz outro café. Você sente-se ainda mais revigorado. O que faz a seguir?",
+        "options": [
+            {
+                "text": "Peço a conta e saio.",
+                "nextScene": "pay_and_leave",
+                "points": 10
+            },
+            {
+                "text": "Continuo a relaxar no café.",
+                "nextScene": "relax_in_cafe",
+                "points": 5
+            }
+        ]
+    },
+    {
+        "id": "relax_in_cafe",
+        "prompt": "Você relaxa no café, aproveitando o ambiente tranquilo. Fim da história.",
+        "options": []
+    }
+]

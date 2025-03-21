@@ -1,6 +1,7 @@
 import streamlit as st
 import chromadb
 import json
+import os
 from fastapi import FastAPI
 
 # Initialize ChromaDB client
@@ -20,6 +21,44 @@ def load_story_data(file_name="story_data.json"):
                 documents=[document],  # Pass the JSON string
                 ids=[scene["id"]]
             )
+
+def load_story_data_from_folder(folder_path="stories"):
+    try:
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith(".json"):
+                file_path = os.path.join(folder_path, file_name)
+                with open(file_path, "r", encoding="utf-8") as file:
+                    story_scenes = json.load(file)
+                    for scene in story_scenes:
+                        # Convert the scene dictionary to a JSON string
+                        document = json.dumps(scene)
+
+                        # Add the scene to the collection
+                        collection.add(
+                            documents=[document],  # Pass the JSON string
+                            ids=[scene["id"]]
+                        )
+        print(f"Successfully loaded stories from folder: {folder_path}")
+    except Exception as e:
+        print(f"Error loading stories from folder {folder_path}: {str(e)}")
+
+# Load story data from folder and refresh the database
+def refresh_story_data(folder_path="stories"):
+    try:
+        # Retrieve all document IDs in the collection
+        all_ids = collection.get()["ids"]
+        if all_ids:
+            # Delete all documents by their IDs
+            collection.delete(ids=all_ids)
+            print("Cleared existing story data from the database.")
+        else:
+            print("No existing story data to clear.")
+
+        # Load new story data from the folder
+        load_story_data_from_folder(folder_path)
+        print(f"Successfully refreshed stories from folder: {folder_path}")
+    except Exception as e:
+        print(f"Error refreshing stories from folder {folder_path}: {str(e)}")
 
 # FastAPI Backend
 app = FastAPI()
@@ -46,16 +85,12 @@ def add_scene(scene: dict):
     except Exception as e:
         return {"error": f"Failed to add scene: {str(e)}"}
 
-# Load initial story data
-STORY_FILE = "story_data.json"  # You can change this to your story file path
+# Refresh story data on app start
+STORY_FOLDER = "stories"  # Specify the folder containing story files
 try:
-    load_story_data(STORY_FILE)
-    load_story_data("stories/cinema.json")
-    print(f"Successfully loaded story from {STORY_FILE}")
-except FileNotFoundError:
-    print(f"Story file {STORY_FILE} not found. Please create it first.")
-except json.JSONDecodeError:
-    print(f"Error parsing {STORY_FILE}. Please check if it's valid JSON.")
+    refresh_story_data(STORY_FOLDER)
+except Exception as e:
+    print(f"Failed to refresh stories: {str(e)}")
 
 # Streamlit Frontend
 st.title("🌍 Interactive Language Learning Story")
@@ -66,8 +101,8 @@ if "points" not in st.session_state:
     st.session_state.points = 0
 
 scene = get_scene(st.session_state.scene_id)
-st.write("Debug - Current scene_id:", st.session_state.scene_id)
-st.write("Debug - Scene content:", scene)
+# st.write("Debug - Current scene_id:", st.session_state.scene_id)
+# st.write("Debug - Scene content:", scene)
 
 if "error" in scene:
     st.error("Nenhuma cena encontrada.")

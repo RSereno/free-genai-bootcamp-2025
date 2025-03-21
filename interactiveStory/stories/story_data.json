@@ -1,0 +1,10 @@
+[{
+    "id": "start",
+    "prompt": "Ir para o café? Ou Cinema?",
+    "options": [
+        { "text": "Café", "nextScene": "cafe_entrance", "points": 10 },
+        { "text": "Cinema", "nextScene": "cinema_entry", "points": 10 }
+    ]
+}
+
+]
