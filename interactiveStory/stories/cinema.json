@@ -1,0 +1,115 @@
+[
+    {
+      "id": "cinema_entry",
+      "prompt": "Chegaste ao cinema. Queres comprar um bilhete?",
+      "options": [
+        {
+          "text": "Sim, quero um bilhete para o próximo filme.",
+          "nextScene": "ticket_purchase",
+          "points": 10
+        },
+        {
+          "text": "Não, só estou a passear.",
+          "nextScene": "leave_cinema",
+          "points": 0,
+          "hint": "Se não comprares um bilhete, não podes ver o filme!"
+        }
+      ]
+    },
+    {
+      "id": "ticket_purchase",
+      "prompt": "O bilheteiro pergunta: \"Qual filme queres ver?\"",
+      "options": [
+        {
+          "text": "O filme de ação às 20h.",
+          "nextScene": "buy_snacks",
+          "points": 10
+        },
+        {
+          "text": "O filme romântico às 21h.",
+          "nextScene": "buy_snacks",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "buy_snacks",
+      "prompt": "Tens o teu bilhete! Agora, queres comprar pipocas e refrigerante?",
+      "options": [
+        {
+          "text": "Sim, adoro pipocas!",
+          "nextScene": "find_seat",
+          "points": 5
+        },
+        {
+          "text": "Não, obrigado.",
+          "nextScene": "find_seat",
+          "points": 0
+        }
+      ]
+    },
+    {
+      "id": "find_seat",
+      "prompt": "Entras na sala de cinema. Há poucos lugares livres. Onde te queres sentar?",
+      "options": [
+        {
+          "text": "Na fila da frente.",
+          "nextScene": "watch_movie",
+          "points": 5
+        },
+        {
+          "text": "No meio da sala.",
+          "nextScene": "watch_movie",
+          "points": 10
+        },
+        {
+          "text": "Na última fila.",
+          "nextScene": "watch_movie",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "watch_movie",
+      "prompt": "O filme começa! Estás a gostar da experiência?",
+      "options": [
+        {
+          "text": "Sim, é incrível!",
+          "nextScene": "end_scene",
+          "points": 10
+        },
+        {
+          "text": "Está um pouco aborrecido.",
+          "nextScene": "end_scene",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "end_scene",
+      "prompt": "O filme acabou! Gostaste da tua ida ao cinema?",
+      "options": [
+        {
+          "text": "Sim, foi uma ótima experiência!",
+          "nextScene": "exit_cinema",
+          "points": 10
+        },
+        {
+          "text": "Foi interessante, mas prefiro outras atividades.",
+          "nextScene": "exit_cinema",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "exit_cinema",
+      "prompt": "Sais do cinema e voltas para casa, satisfeito com a tua noite.",
+      "options": []
+    },
+    {
+      "id": "leave_cinema",
+      "prompt": "Decidiste não entrar. Talvez noutra altura!",
+      "options": []
+    }
+  ]
+  

@@ -71,4 +71,5 @@ wheels/
 # Project specific
 language-listening-app/backend/transcripts/*
 
-personalNotes.md
+# Ignore ChromaDB database files
+chroma_db/
