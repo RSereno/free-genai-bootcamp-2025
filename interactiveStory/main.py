@@ -5,10 +5,13 @@ from frontend.utils import display_scene
 
 # Refresh story data on app start
 STORY_FOLDER = "stories"  # Specify the folder containing story files
-try:
-    refresh_story_data(STORY_FOLDER)
-except Exception as e:
-    print(f"Failed to refresh stories: {str(e)}")
+
+if "data_refreshed" not in st.session_state:
+    try:
+        refresh_story_data(STORY_FOLDER)
+        st.session_state.data_refreshed = True  # Set the flag to indicate data has been refreshed
+    except Exception as e:
+        print(f"Failed to refresh stories: {str(e)}")
 
 # Streamlit Frontend
 st.title("🌍 Interactive Language Learning Story")
